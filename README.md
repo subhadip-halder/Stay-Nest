@@ -11,6 +11,7 @@ The interface uses Bootstrap and custom CSS. Listing photos are stored with Clou
 ## Features
 
 - Browse vacation-rental listings with photos, nightly prices, locations, and descriptions.
+- Filter the currently loaded stays with the category chips.
 - Search listings by title, location, or country. Search is case-insensitive and supports partial matches.
 - View listing details, owner information, reviews, and a map when coordinates are available.
 - Register, log in, and log out with Passport Local authentication.
@@ -19,7 +20,7 @@ The interface uses Bootstrap and custom CSS. Listing photos are stored with Clou
 - Add reviews to listings and delete reviews as their author.
 - Keep login sessions in MongoDB with `connect-mongo`.
 - Show validation feedback and session flash messages.
-- Toggle the display of the additional tax estimate on listing cards.
+- Toggle listing card prices between the base rate and an 18% GST-inclusive estimate.
 
 ## Technology
 
@@ -70,7 +71,13 @@ For MongoDB Atlas, make sure the database user and network access rules permit c
 ### 4. Run the application
 
 ```bash
-node app.js
+npm start
+```
+
+For development with automatic restarts:
+
+```bash
+npm run dev
 ```
 
 When the database connection succeeds, the app listens on port `8080`:
@@ -79,7 +86,6 @@ When the database connection succeeds, the app listens on port `8080`:
 http://localhost:8080/listings
 ```
 
-The project does not currently define an `npm start` script.
 
 ## Routes
 
@@ -98,7 +104,7 @@ The project does not currently define an `npm start` script.
 | `POST` | `/signup` | Register a user | Public |
 | `GET` | `/login` | Show the login form | Public |
 | `POST` | `/login` | Authenticate a user | Public |
-| `GET` | `/logout` | End the current session | Any session |
+| `POST` | `/logout` | End the current session | Any session |
 
 The listing update and delete forms use `method-override` to submit `PUT` and `DELETE` requests from standard HTML forms.
 
@@ -181,7 +187,7 @@ Creating listings and reviews requires signing in. Editing or deleting a listing
 
 ## Development notes
 
-- The server uses the default port `8080` in `app.js`.
+- The server uses `PORT` when provided by its host and defaults to `8080` locally.
 - EJS templates use `ejs-mate` for layouts and partials.
 - Flash messages are stored in the user session and rendered by the shared layout.
 - The `npm test` script is currently a placeholder; no automated test suite is configured yet.

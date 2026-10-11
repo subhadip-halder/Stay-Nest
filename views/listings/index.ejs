@@ -1,11 +1,5 @@
 <% layout("/layouts/boilerplate") %>
 <!-- <%= success %> -->
-<body>
-    <!-- <h3>All Listings</h3> -->
-    <!-- <form method="get" action="/listings/new">
-        <button>Create New Listing</button>
-    </form> -->
-
     <style>
         #filters {
             display: flex;
@@ -37,12 +31,17 @@
         .filter {
             flex: 0 0 auto;
             min-width: 4.5rem;
+            border: 0;
+            border-bottom: 2px solid transparent;
+            background: transparent;
+            font: inherit;
+            appearance: none;
             text-align: center;
             margin: 0;
             padding: 0.5rem 0.15rem 0.75rem;
             color: #717171;
             white-space: nowrap;
-            border-bottom: 2px solid transparent;
+            cursor: pointer;
             transition: color 160ms ease, border-color 160ms ease;
         }
 
@@ -55,7 +54,17 @@
             border-bottom-color: #b0b0b0;
         }
 
-        .filter p {
+        .filter.active {
+            color: #222;
+            border-bottom-color: #222;
+        }
+
+        .filter:focus-visible {
+            outline: 2px solid #222;
+            outline-offset: 2px;
+        }
+
+        .filter-label {
             font-size: 0.8rem;
             font-weight: 600;
             margin: 0.45rem 0 0;
@@ -77,6 +86,7 @@
         .tax-toggle .form-check {
             min-height: 0;
             margin: 0;
+            padding: 0;
             display: flex;
             align-items: center;
             gap: 0.45rem;
@@ -95,58 +105,54 @@
             margin: 0;
         }
 
-        .tax-info {
-            display: none;
-        }
-
     </style>
 
     <div id="filters">
       <div class="filter-list">
-        <div class="filter">
-            <div><i class="fa-solid fa-fire"></i></div>
-            <p>Trending</p>
-        </div>
-        <div class="filter">
-            <div><i class="fa-solid fa-bed"></i></div>
-            <p>Rooms</p>
-        </div>
-        <div class="filter">
-            <div><i class="fa-solid fa-mountain-city"></i></div>
-            <p>Iconic Cities</p>
-        </div>
-        <div class="filter">
-            <div><i class="fa-solid fa-mountain"></i></div>
-            <p>Mountains</p>
-        </div>
-        <div class="filter">
-            <div><i class="fa-brands fa-fort-awesome"></i></div>
-            <p>Castles</p>
-        </div>
-        <div class="filter">
-            <div><i class="fa-solid fa-water-ladder"></i></div>
-            <p>Amazing Pools</p>
-        </div>
-        <div class="filter">
-            <div><i class="fa-solid fa-campground"></i></div>
-            <p>Camping</p>
-        </div>
-        <div class="filter">
-            <div><i class="fa-solid fa-cow"></i></div>
-            <p>farms</p>
-        </div>
-        <div class="filter">
-            <div><i class="fa-regular fa-snowflake"></i></div>
-            <p>Arctic</p>
-        </div>
-        <div class="filter">
-            <div><i class="fa-solid fa-landmark-dome"></i></div>
-            <p>Domes</p>
-        </div>
-        <div class="filter">
-            <div><i class="fa-solid fa-ship"></i></div>
-            <p>Boats</p>
-        </div>
+        <button class="filter" type="button" data-category-filter="trending" aria-pressed="false">
+            <span class="d-block"><i class="fa-solid fa-fire" aria-hidden="true"></i></span>
+            <span class="filter-label d-block">Trending</span>
+        </button>
+        <button class="filter" type="button" data-category-filter="rooms" aria-pressed="false">
+            <span class="d-block"><i class="fa-solid fa-bed" aria-hidden="true"></i></span>
+            <span class="filter-label d-block">Rooms</span>
+        </button>
+        <button class="filter" type="button" data-category-filter="cities" aria-pressed="false">
+            <span class="d-block"><i class="fa-solid fa-mountain-city" aria-hidden="true"></i></span>
+            <span class="filter-label d-block">Iconic Cities</span>
+        </button>
+        <button class="filter" type="button" data-category-filter="mountains" aria-pressed="false">
+            <span class="d-block"><i class="fa-solid fa-mountain" aria-hidden="true"></i></span>
+            <span class="filter-label d-block">Mountains</span>
+        </button>
+        <button class="filter" type="button" data-category-filter="castles" aria-pressed="false">
+            <span class="d-block"><i class="fa-brands fa-fort-awesome" aria-hidden="true"></i></span>
+            <span class="filter-label d-block">Castles</span>
+        </button>
+        <button class="filter" type="button" data-category-filter="pools" aria-pressed="false">
+            <span class="d-block"><i class="fa-solid fa-water-ladder" aria-hidden="true"></i></span>
+            <span class="filter-label d-block">Amazing Pools</span>
+        </button>
+        <button class="filter" type="button" data-category-filter="camping" aria-pressed="false">
+            <span class="d-block"><i class="fa-solid fa-campground" aria-hidden="true"></i></span>
+            <span class="filter-label d-block">Camping</span>
+        </button>
+        <button class="filter" type="button" data-category-filter="farms" aria-pressed="false">
+            <span class="d-block"><i class="fa-solid fa-cow" aria-hidden="true"></i></span>
+            <span class="filter-label d-block">Farms</span>
+        </button>
+        <button class="filter" type="button" data-category-filter="arctic" aria-pressed="false">
+            <span class="d-block"><i class="fa-regular fa-snowflake" aria-hidden="true"></i></span>
+            <span class="filter-label d-block">Arctic</span>
+        </button>
+        <button class="filter" type="button" data-category-filter="domes" aria-pressed="false">
+            <span class="d-block"><i class="fa-solid fa-landmark-dome" aria-hidden="true"></i></span>
+            <span class="filter-label d-block">Domes</span>
+        </button>
+        <button class="filter" type="button" data-category-filter="boats" aria-pressed="false">
+            <span class="d-block"><i class="fa-solid fa-ship" aria-hidden="true"></i></span>
+            <span class="filter-label d-block">Boats</span>
+        </button>
       </div>
         <div class="tax-toggle">
             <div class="form-check form-switch">
@@ -157,46 +163,48 @@
 
     </div>
 
-<% if (searchQuery) { %>
-    <p class="text-muted mt-3 mb-0" role="status">
+<p id="results-summary" class="text-muted mt-3 mb-0" role="status"
+   data-search-query="<%= searchQuery || '' %>">
+    <% if (searchQuery) { %>
         <% if (allListings.length) { %>
             <%= allListings.length %> result<%= allListings.length === 1 ? "" : "s" %> for “<%= searchQuery %>”
         <% } else { %>
             No listings found for “<%= searchQuery %>”. Try another destination, title, or country.
         <% } %>
-    </p>
+    <% } else { %>
+        <%= allListings.length %> stay<%= allListings.length === 1 ? "" : "s" %>
+    <% } %>
+</p>
+
+<p id="filter-status" class="visually-hidden" role="status" aria-live="polite"></p>
+<div id="category-empty-state" class="empty-state d-none">
+    <h2 class="h4">No stays match this category</h2>
+    <p class="text-muted">Try another category or browse all available stays.</p>
+    <button id="clear-category-filter" class="btn btn-outline-dark" type="button">Show all stays</button>
+</div>
+<% if (!allListings.length && !searchQuery) { %>
+    <div class="empty-state">
+        <h2 class="h4">No stays are available yet</h2>
+        <p class="text-muted">Please check back later.</p>
+    </div>
 <% } %>
-
-<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
-    <% for(let listing of allListings){ %> 
-        <a href="/listings/<%= listing._id %>" class="listing-link">  
-<div class="card col listing-card">
-  <img src="<%= listing.image.url %>" class="card-img-top" alt="<%= listing.title %>" style="height: 20rem;">
-  <div class="card-img-overlay"></div>
-  <div class="card-body">
-    <p class="card-text">
-        <b><%= listing.title %></b> <br>
-        ₹<%= listing.price.toLocaleString("en-IN") %> / night
-        <i class="tax-info"> &nbsp; &nbsp; +18% GST</i>
-    </p>
-  </div>
+<div id="listings-grid" class="row row-cols-1 row-cols-sm-2 row-cols-xl-3 g-4 listing-grid">
+    <% for (const [index, listing] of allListings.entries()) { %>
+        <a href="/listings/<%= listing._id %>" class="col listing-link" data-listing-item
+           data-listing-index="<%= index %>"
+           data-searchable="<%= [listing.title, listing.description, listing.location, listing.country].filter(Boolean).join(' ') %>">
+            <article class="card listing-card">
+                <img src="<%= listing.image?.url || '' %>" class="card-img-top" alt="<%= listing.title %>" loading="lazy">
+                <div class="card-body">
+                    <p class="card-text">
+                        <b><%= listing.title %></b><br>
+                        <span class="listing-price" data-base-price="<%= Number(listing.price) || 0 %>">
+                            ₹<%= (Number(listing.price) || 0).toLocaleString("en-IN") %> / night
+                        </span>
+                        <span class="listing-price-total d-none"></span>
+                    </p>
+                </div>
+            </article>
+        </a>
+    <% } %>
 </div>
-</a> 
-<% } %> 
-</div>
-
-</body>
-
-<script>
-    let taxSwitch = document.getElementById("flexSwitchCheckDefault")
-    taxSwitch.addEventListener("click", () => {
-        let taxInfo = document.getElementsByClassName("tax-info")
-        for(info of taxInfo){
-            if(info.style.display != "inline"){
-                info.style.display = "inline"
-            }else{
-                info.style.display = "none"
-            }
-        }
-    })
-</script>

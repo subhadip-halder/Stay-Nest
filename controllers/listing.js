@@ -5,6 +5,10 @@ const mapToken = process.env.MAP_TOKEN
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 const geocodeLocation = async (location, country) => {
+    if (!mapToken) {
+        throw new ExpressError(503, "Mapbox is not configured. Add a MAP_TOKEN before creating or moving a listing.")
+    }
+
     const response = await geocodingClient.forwardGeocode({
         query: [location, country].filter(Boolean).join(", "),
         limit: 1,
@@ -73,6 +77,10 @@ module.exports.showListing = async (req, res) => {
 }
 
 module.exports.createListing = async(req, res) => {
+    if (!req.file) {
+        throw new ExpressError(400, "Please choose a listing image.")
+    }
+
     const geometry = await geocodeLocation(req.body.listing.location, req.body.listing.country)
     if (!geometry) {
         throw new ExpressError(400, "Could not find that listing location. Please enter a more specific place.")
@@ -98,7 +106,7 @@ module.exports.renderEditForm = async(req, res) => {
     const listing = await Listing.findById(id)
     if(!listing){
         req.flash("error", "Listing you requested for does not exist")
-        res.redirect("/listings")
+        return res.redirect("/listings")
     }
 
     let originalImageUrl = listing.image.url
@@ -115,6 +123,7 @@ module.exports.updateListing = async (req, res) => {
     }
 
     const locationChanged = req.body.listing.location !== listing.location
+        || req.body.listing.country !== listing.country
     Object.assign(listing, req.body.listing)
     if (locationChanged) {
         const geometry = await geocodeLocation(req.body.listing.location, req.body.listing.country)

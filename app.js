@@ -22,6 +22,11 @@ const userRouter = require("./routes/user.js")
 
 // const MONGO_URL = "mongodb://127.0.0.1:27017/staynest"
 const dbUrl = process.env.ATLASDB_URL
+const port = Number(process.env.PORT) || 8080
+
+if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", 1)
+}
 
 app.set("view engine", "ejs")
 app.set("views", path.join(__dirname, "views"))
@@ -48,11 +53,12 @@ const sessionOptions = {
     store,
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
-        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
     }
 }
 
@@ -77,6 +83,10 @@ app.use((req, res, next) => {
     res.locals.error = req.flash("error")
     res.locals.currUser = req.user
     next()
+})
+
+app.get("/", (req, res) => {
+    res.redirect("/listings")
 })
 
 app.use("/listings", listingRouter)
@@ -117,8 +127,8 @@ async function main() {
         await mongoose.connect(dbUrl)
         console.log("connected to DB")
 
-        app.listen(8080, () => {
-            console.log("Server is listening on port 8080")
+        app.listen(port, () => {
+            console.log(`Server is listening on port ${port}`)
         })
     } catch (err) {
         console.error("Failed to connect to DB:", err)

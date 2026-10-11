@@ -1,9 +1,8 @@
 <% layout("/layouts/boilerplate") %>
 
 <div class="row mt-3">
-    <div class="alert alert-danger col-6 offset-3" role="alert">
-        <!-- A simple danger alert—check it out! -->
-         <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-         <h4 class="alert-heading"> <%= message %> </h4>
+    <div class="alert alert-danger col-12 col-md-10 col-lg-8 mx-auto" role="alert">
+         <h1 class="h5 alert-heading"><%= message %></h1>
+         <a href="/listings" class="alert-link">Back to all stays</a>
     </div>
 </div>
