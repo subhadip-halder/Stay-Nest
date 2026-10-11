@@ -2,6 +2,7 @@ const Listing = require("./models/listing")
 const Review = require("./models/review.js")
 const ExpressError = require("./utils/ExpressError.js")
 const {listingSchema,reviewSchema} = require("./schema.js")
+const mongoose = require("mongoose")
 
 module.exports.isLoggedIn = (req, res, next) => {
     // console.log(req.path, "..", req.originalUrl)
@@ -22,6 +23,7 @@ module.exports.savedRedirectUrl = (req, res, next) => {
 
 module.exports.isOwner = async (req, res, next) => {
     let {id} = req.params
+    if (!mongoose.isValidObjectId(id)) throw new ExpressError(404, "Listing not found.")
     let listing = await Listing.findById(id)
     if (!listing) {
         req.flash("error", "This listing could not be found.")
@@ -56,6 +58,7 @@ module.exports.validateReview = (req, res, next) => {
 
 module.exports.isReviewAuthor = async (req, res, next) => {
     let {id, reviewId} = req.params
+    if (!mongoose.isValidObjectId(id) || !mongoose.isValidObjectId(reviewId)) throw new ExpressError(404, "Review not found.")
     let review = await Review.findById(reviewId)
     if (!review) {
         req.flash("error", "This review could not be found.")
@@ -65,5 +68,7 @@ module.exports.isReviewAuthor = async (req, res, next) => {
         req.flash("error", "You are not the author of this review")
         return res.redirect(`/listings/${id}`)
     }
+    const listing = await Listing.exists({ _id: id, reviews: reviewId })
+    if (!listing) throw new ExpressError(404, "Review not found for this listing.")
     next()
 }

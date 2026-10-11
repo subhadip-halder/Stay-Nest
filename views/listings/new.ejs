@@ -2,7 +2,8 @@
 
 <div class="form-page">
     <h1 class="h3">Create a New Listing</h1>
-    <form method="post" action="/listings" novalidate class="needs-validation" enctype="multipart/form-data">
+    <form method="post" action="/listings?_csrf=<%= encodeURIComponent(csrfToken) %>" novalidate class="needs-validation" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="mb-3">
         <label for="title" class="form-label">Title</label>
         <input id="title" type="text" name="listing[title]" placeholder="Add a catchy title" class="form-control" required>

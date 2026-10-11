@@ -6,6 +6,8 @@ const express = require("express")
 const app = express()
 const mongoose = require("mongoose")
 const path = require("path")
+const crypto = require("crypto")
+const csrfProtection = require("./utils/csrf.js")
 const methodOverride = require("method-override")
 const ejsMate = require("ejs-mate")
 const ExpressError = require("./utils/ExpressError.js")
@@ -24,17 +26,43 @@ const userRouter = require("./routes/user.js")
 const dbUrl = process.env.ATLASDB_URL
 const port = Number(process.env.PORT) || 8080
 
+if (!dbUrl || !process.env.SECRET) {
+    throw new Error("ATLASDB_URL and SECRET must be configured")
+}
+
 if (process.env.NODE_ENV === "production") {
     app.set("trust proxy", 1)
 }
 
 app.set("view engine", "ejs")
 app.set("views", path.join(__dirname, "views"))
-app.use(express.urlencoded({extended: true}))
+app.use((req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff")
+    res.setHeader("X-Frame-Options", "DENY")
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin")
+    res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    res.setHeader("Content-Security-Policy", [
+        "default-src 'self'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "frame-ancestors 'none'",
+        "object-src 'none'",
+        "script-src 'self' https://api.mapbox.com https://cdn.jsdelivr.net",
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://api.mapbox.com",
+        "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com",
+        "img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com https://api.mapbox.com https://*.mapbox.com",
+        "connect-src 'self' https://api.mapbox.com https://events.mapbox.com",
+        "worker-src 'self' blob:",
+    ].join("; "))
+    if (process.env.NODE_ENV === "production") {
+        res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    }
+    next()
+})
+app.use(express.urlencoded({ extended: true, limit: "20kb", parameterLimit: 100 }))
 app.use(methodOverride("_method"))
 app.engine("ejs", ejsMate) 
 app.use(express.static(path.join(__dirname, "/public")))
-app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 const store = MongoStore.create({
     mongoUrl: dbUrl,
@@ -69,6 +97,12 @@ const sessionOptions = {
 
 
 app.use(session(sessionOptions))
+app.use((req, res, next) => {
+    if (!req.session.csrfToken) req.session.csrfToken = crypto.randomBytes(32).toString("hex")
+    res.locals.csrfToken = req.session.csrfToken
+    next()
+})
+app.use(csrfProtection)
 app.use(flash())
 
 app.use(passport.initialize())
@@ -116,10 +150,13 @@ app.all("/{*splat}", (req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-    // res.send("something went wrong")
-    let {statusCode = 500, message = "Something not Found!"} = err
+    if (res.headersSent) return next(err)
+    const statusCode = err.name === "MulterError"
+        ? (err.code === "LIMIT_FILE_SIZE" ? 413 : 400)
+        : Number.isInteger(err.statusCode) && err.statusCode >= 400 && err.statusCode < 600 ? err.statusCode : 500
+    const message = statusCode >= 500 ? "Something went wrong. Please try again later." : err.message
+    if (statusCode >= 500) console.error(err)
     res.status(statusCode).render("error.ejs", {message})
-    // res.status(statusCode).send(message)
 })
 
 async function main() {

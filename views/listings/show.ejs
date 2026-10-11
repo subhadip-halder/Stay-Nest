@@ -18,6 +18,7 @@
         <div class="btns">
             <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark edit-btn">Edit listing</a>
             <form method="post" action="/listings/<%= listing._id %>?_method=DELETE">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <button class="btn btn-outline-danger" type="submit">Delete listing</button>
             </form>
         </div>
@@ -27,6 +28,7 @@
         <% if (currUser) { %>
             <h2 class="h4" id="reviews-heading">Leave a review</h2>
             <form action="/listings/<%= listing._id %>/reviews" method="post" novalidate class="needs-validation mb-4">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <div class="mb-3">
                     <p class="form-label mb-1" id="rating-label">Your rating</p>
                     <fieldset class="starability-slot" aria-labelledby="rating-label">
@@ -63,6 +65,7 @@
                         <p class="mb-2"><%= review.comment %></p>
                         <% if (currUser && review.author && currUser._id.equals(review.author._id)) { %>
                             <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" method="post">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <button class="btn btn-sm btn-outline-danger" type="submit">Delete review</button>
                             </form>
                         <% } %>

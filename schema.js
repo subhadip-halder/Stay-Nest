@@ -2,11 +2,11 @@ const Joi = require('joi')
 
 module.exports.listingSchema = Joi.object({
     listing: Joi.object({
-        title: Joi.string().required(),
-        description: Joi.string().required(),
-        location: Joi.string().required(),
-        country: Joi.string().required(),
-        price: Joi.number().min(0).required(),
+        title: Joi.string().trim().min(3).max(100).required(),
+        description: Joi.string().trim().min(10).max(5000).required(),
+        location: Joi.string().trim().min(2).max(160).required(),
+        country: Joi.string().trim().min(2).max(100).required(),
+        price: Joi.number().min(0).max(100000000).required(),
         image: Joi.object({
             url: Joi.string().allow("", null),
         }).optional()
@@ -15,7 +15,7 @@ module.exports.listingSchema = Joi.object({
 
 module.exports.reviewSchema = Joi.object({
     review: Joi.object({
-        rating: Joi.number().required().min(1).max(5),
-        comment: Joi.string().required(),
+        rating: Joi.number().integer().required().min(1).max(5),
+        comment: Joi.string().trim().min(2).max(2000).required(),
     }).required()
 })

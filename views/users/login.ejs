@@ -3,6 +3,7 @@
 <div class="form-page">
     <h1 class="h3">Log in to StayNest</h1>
         <form action="/login" method="post" class="needs-validation" novalidate>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
         <div class="mb-3">
         <label for="username" class="form-label">Username</label>

@@ -1,4 +1,5 @@
 const Listing = require("../models/listing")
+const mongoose = require("mongoose")
 const ExpressError = require("../utils/ExpressError.js")
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN
@@ -31,7 +32,7 @@ module.exports.index = async (req, res) => {
         ]
     }
 
-    const allListings = await Listing.find(filter)
+    const allListings = await Listing.find(filter).sort({ _id: -1 }).limit(100).lean()
     res.render("listings/index.ejs", { allListings, searchQuery })
 }
 
@@ -41,6 +42,7 @@ module.exports.renderNewForm = (req, res) => {
 
 module.exports.showListing = async (req, res) => {
     let {id} = req.params
+    if (!mongoose.isValidObjectId(id)) throw new ExpressError(404, "Listing not found.")
     const listing = await Listing.findById(id)
     .populate({path: "reviews", 
         populate: {
@@ -103,6 +105,7 @@ module.exports.createListing = async(req, res) => {
 
 module.exports.renderEditForm = async(req, res) => {
     let {id} = req.params
+    if (!mongoose.isValidObjectId(id)) throw new ExpressError(404, "Listing not found.")
     const listing = await Listing.findById(id)
     if(!listing){
         req.flash("error", "Listing you requested for does not exist")
@@ -116,6 +119,7 @@ module.exports.renderEditForm = async(req, res) => {
 
 module.exports.updateListing = async (req, res) => {
     let {id} = req.params
+    if (!mongoose.isValidObjectId(id)) throw new ExpressError(404, "Listing not found.")
     let listing = await Listing.findById(id)
     if (!listing) {
         req.flash("error", "Listing you requested for does not exist")
@@ -124,7 +128,8 @@ module.exports.updateListing = async (req, res) => {
 
     const locationChanged = req.body.listing.location !== listing.location
         || req.body.listing.country !== listing.country
-    Object.assign(listing, req.body.listing)
+    const { title, description, price, location, country } = req.body.listing
+    Object.assign(listing, { title, description, price, location, country })
     if (locationChanged) {
         const geometry = await geocodeLocation(req.body.listing.location, req.body.listing.country)
         if (!geometry) {
@@ -146,6 +151,7 @@ module.exports.updateListing = async (req, res) => {
 
 module.exports.destroyListing = async (req, res) => {
     let {id} = req.params
+    if (!mongoose.isValidObjectId(id)) throw new ExpressError(404, "Listing not found.")
     let deletedListings = await Listing.findByIdAndDelete(id)
     console.log(deletedListings);
     req.flash("success", "Listing Deleted!")
