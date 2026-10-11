@@ -1,0 +1,202 @@
+<% layout("/layouts/boilerplate") %>
+<!-- <%= success %> -->
+<body>
+    <!-- <h3>All Listings</h3> -->
+    <!-- <form method="get" action="/listings/new">
+        <button>Create New Listing</button>
+    </form> -->
+
+    <style>
+        #filters {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: clamp(0.5rem, 1vw, 1rem);
+            width: 100%;
+            padding: 0.25rem 0 0.75rem;
+            margin: 1.25rem 0 1rem;
+            border-bottom: 1px solid #e9e9e9;
+        }
+
+        .filter-list {
+            display: flex;
+            align-items: center;
+            flex: 1 1 auto;
+            min-width: 0;
+            gap: clamp(0.5rem, 1.5vw, 1.25rem);
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .filter-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter {
+            flex: 0 0 auto;
+            min-width: 4.5rem;
+            text-align: center;
+            margin: 0;
+            padding: 0.5rem 0.15rem 0.75rem;
+            color: #717171;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            transition: color 160ms ease, border-color 160ms ease;
+        }
+
+        .filter i {
+            font-size: 1.15rem;
+        }
+
+        .filter:hover {
+            color: #222;
+            border-bottom-color: #b0b0b0;
+        }
+
+        .filter p {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 0.45rem 0 0;
+        }
+
+        .tax-toggle {
+            display: flex;
+            align-items: center;
+            flex: 0 0 auto;
+            max-width: 13rem;
+            padding: 0.6rem 0.75rem;
+            color: #222;
+            border: 1px solid #d9d9d9;
+            border-radius: 0.75rem;
+            background: #fff;
+            box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+        }
+
+        .tax-toggle .form-check {
+            min-height: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .tax-toggle .form-check-input {
+            float: none;
+            flex: 0 0 auto;
+            margin: 0;
+        }
+
+        .tax-toggle .form-check-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            line-height: 1.25;
+            margin: 0;
+        }
+
+        .tax-info {
+            display: none;
+        }
+
+    </style>
+
+    <div id="filters">
+      <div class="filter-list">
+        <div class="filter">
+            <div><i class="fa-solid fa-fire"></i></div>
+            <p>Trending</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-bed"></i></div>
+            <p>Rooms</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-mountain-city"></i></div>
+            <p>Iconic Cities</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-mountain"></i></div>
+            <p>Mountains</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-brands fa-fort-awesome"></i></div>
+            <p>Castles</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-water-ladder"></i></div>
+            <p>Amazing Pools</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-campground"></i></div>
+            <p>Camping</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-cow"></i></div>
+            <p>farms</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-regular fa-snowflake"></i></div>
+            <p>Arctic</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-landmark-dome"></i></div>
+            <p>Domes</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-ship"></i></div>
+            <p>Boats</p>
+        </div>
+      </div>
+        <div class="tax-toggle">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Display Total after taxes</label>
+            </div>
+        </div>
+
+    </div>
+
+<% if (searchQuery) { %>
+    <p class="text-muted mt-3 mb-0" role="status">
+        <% if (allListings.length) { %>
+            <%= allListings.length %> result<%= allListings.length === 1 ? "" : "s" %> for “<%= searchQuery %>”
+        <% } else { %>
+            No listings found for “<%= searchQuery %>”. Try another destination, title, or country.
+        <% } %>
+    </p>
+<% } %>
+
+<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+    <% for(let listing of allListings){ %> 
+        <a href="/listings/<%= listing._id %>" class="listing-link">  
+<div class="card col listing-card">
+  <img src="<%= listing.image.url %>" class="card-img-top" alt="<%= listing.title %>" style="height: 20rem;">
+  <div class="card-img-overlay"></div>
+  <div class="card-body">
+    <p class="card-text">
+        <b><%= listing.title %></b> <br>
+        ₹<%= listing.price.toLocaleString("en-IN") %> / night
+        <i class="tax-info"> &nbsp; &nbsp; +18% GST</i>
+    </p>
+  </div>
+</div>
+</a> 
+<% } %> 
+</div>
+
+</body>
+
+<script>
+    let taxSwitch = document.getElementById("flexSwitchCheckDefault")
+    taxSwitch.addEventListener("click", () => {
+        let taxInfo = document.getElementsByClassName("tax-info")
+        for(info of taxInfo){
+            if(info.style.display != "inline"){
+                info.style.display = "inline"
+            }else{
+                info.style.display = "none"
+            }
+        }
+    })
+</script>
